@@ -207,6 +207,9 @@ header h1 {
     outline: none;
   }
   
+ .hide {
+     display: none;
+ } 
 
 /* ===================================== 
    Media Queries
