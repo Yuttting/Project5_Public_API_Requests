@@ -3,9 +3,6 @@
 //     <input type="search" id="search-input" class="search-input" placeholder="Search...">
 //     <input type="submit" value="&#x1F50D;" id="search-submit" class="search-submit">
 // </form>
-//How to Insert Unicode character into JavaScript:
-//https://stackoverflow.com/questions/13093126/insert-unicode-character-into-javascript
-//https://www.fileformat.info/info/unicode/char/1f50d/index.htm         
 const searchDiv = document.getElementsByClassName('search-container')[0];
 const form = document.createElement('form');
 form.action = '#';
@@ -50,6 +47,9 @@ $.ajax({
 */
 const galleryDiv = document.getElementById('gallery');
 const body = document.getElementsByTagName('body')[0];
+const names = document.getElementsByClassName('card-name');
+
+
 function generateHTML(data){
     for(let i=0; i<data.results.length; i++){
         const cardDiv = document.createElement('div');
@@ -68,15 +68,15 @@ function generateHTML(data){
         cardInfo.innerHTML = `
             <h3 id="name" class="card-name cap">${data.results[i].name.first} ${data.results[i].name.last}</h3>
             <p class="card-text">${data.results[i].email}</p>
-            <p class="card-text cap">${data.results[i].location.city}, ${data.results[i].location.state}</p>
+            <p class="card-text cap">${data.results[i].location.city}</p>
             <p class = "hide">${data.results[i].phone}</p>
-            <p class = "hide">${data.results[i].location.street.number} ${data.results[i].location.street.name}, ${data.results[i].location.city}, ${data.results[i].location.state} ${data.results[i].location.postcode}</p>
+            <p class = "hide">${data.results[i].location.street.number} ${data.results[i].location.street.name}, ${data.results[i].location.state} ${data.results[i].location.postcode}</p>
             <p class = "hide">Birthday: ${bmonth}/${bday}/${byear}</p>
             `;
-    
         cardDiv.appendChild(cardInfo);
 
-
+        
+        // when click a card, shows a modal window
         // <div class="modal-container">
         //     <div class="modal">
         //         <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
@@ -99,24 +99,39 @@ function generateHTML(data){
         //     </div>
         // </div>
 
+        const modalContainer = document.createElement('div');
+        modalContainer.className = "modal-container";
+        const modal = document.createElement('div');
+        modal.className = "modal";
+        const button = document.createElement('button');
+        button.type = "button";
+        button.id = "modal-close-btn";
+        button.className = "modal-close-btn";
+        button.innerHTML = "<strong>X</strong>";
+        const modalInfo = document.createElement('div');
+        modalInfo.className = "modal-info-container";
+
+        //generate Prev and Next buttons
+        const modalBtn = document.createElement('div');
+        modalBtn.className = "modal-btn-container";
+        buttonPrev = document.createElement('button');
+        buttonPrev.type = "button";
+        buttonPrev.id = "modal-prev";
+        buttonPrev.className = "modal-prev btn";
+        buttonPrev.textContent = "Prev";
+        buttonNext = document.createElement('button');
+        buttonNext.type = "button";
+        buttonNext.id = "modal-next";
+        buttonNext.className = "modal-next btn";
+        buttonNext.textContent = "Next";
+        button.onclick = function(){modalContainer.style.display = "none"};
+
         cardDiv.addEventListener('click', (e)=>{
-            console.log(e.target);
-            console.log(e.currentTarget);
-            const modalContainer = document.createElement('div');
-            modalContainer.className = "modal-container";
+            modalContainer.style.display = "block";
             body.appendChild(modalContainer);
-            const modal = document.createElement('div');
-            modal.className = "modal";
             modalContainer.appendChild(modal);
-            const button = document.createElement('button');
-            button.type = "button";
-            button.id = "modal-close-btn";
-            button.className = "modal-close-btn";
-            button.innerHTML = "<strong>X</strong>";
-            button.onclick = function(){modalContainer.style.display = "none"}
+            button.onclick = function(){modalContainer.style.display = "none"};
             modal.appendChild(button);
-            const modalInfo = document.createElement('div');
-            modalInfo.className = "modal-info-container";
             modalInfo.innerHTML = `
                 <img class="modal-img" src=${e.currentTarget.firstElementChild.firstElementChild.src} alt="profile picture">
                 <h3 id="name" class="modal-name cap">${e.currentTarget.firstElementChild.nextElementSibling.firstElementChild.textContent}</h3>
@@ -128,19 +143,83 @@ function generateHTML(data){
                 <p class="modal-text">${e.currentTarget.children[1].children[5].textContent}</p>
             `;
             modal.appendChild(modalInfo);
+
+            modalContainer.appendChild(modalBtn);
+            modalBtn.appendChild(buttonPrev);
+            modalBtn.appendChild(buttonNext);
+            
+
+            //Click the Prev button to show the modal window of the preivous card
+            buttonPrev.onclick = function(e){
+                for(let j = 1; j < names.length; j++){
+                    if(names[j].textContent === e.target.parentNode.previousSibling.children[1].children[1].textContent){
+                        body.appendChild(modalContainer);
+                        modalContainer.appendChild(modal);
+                        modal.appendChild(button);
+                        modalInfo.innerHTML = `
+                            <img class="modal-img" src=${document.getElementsByClassName('card-img')[j-1].src} alt="profile picture">
+                            <h3 id="name" class="modal-name cap">${names[j-1].textContent}</h3>
+                            <p class="modal-text">${names[j-1].nextElementSibling.textContent}</p>
+                            <p class="modal-text cap">${names[j-1].nextElementSibling.nextElementSibling.textContent}</p>
+                            <hr>
+                            <p class="modal-text">${names[j-1].nextElementSibling.nextElementSibling.nextElementSibling.textContent}</p>
+                            <p class="modal-text">${names[j-1].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.textContent}</p>
+                            <p class="modal-text">${names[j-1].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.textContent}</p>
+                        `;
+                        modal.appendChild(modalInfo);
+                        modalContainer.appendChild(modalBtn);
+                        modalBtn.appendChild(buttonPrev);
+                        modalBtn.appendChild(buttonNext);
+                    }
+                }
+            };
+
+            buttonNext.onclick = function(e){
+                for(let j = names.length -2; j > -1; j--){
+                    if(names[j].textContent === e.target.parentNode.previousSibling.children[1].children[1].textContent){
+                        body.appendChild(modalContainer);
+                        modalContainer.appendChild(modal);
+                        modal.appendChild(button);
+                        modalInfo.innerHTML = `
+                            <img class="modal-img" src=${document.getElementsByClassName('card-img')[j+1].src} alt="profile picture">
+                            <h3 id="name" class="modal-name cap">${names[j+1].textContent}</h3>
+                            <p class="modal-text">${names[j+1].nextElementSibling.textContent}</p>
+                            <p class="modal-text cap">${names[j+1].nextElementSibling.nextElementSibling.textContent}</p>
+                            <hr>
+                            <p class="modal-text">${names[j+1].nextElementSibling.nextElementSibling.nextElementSibling.textContent}</p>
+                            <p class="modal-text">${names[j+1].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.textContent}</p>
+                            <p class="modal-text">${names[j+1].nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.nextElementSibling.textContent}</p>
+                        `;
+                        modal.appendChild(modalInfo);
+                        modalContainer.appendChild(modalBtn);
+                        modalBtn.appendChild(buttonPrev);
+                        modalBtn.appendChild(buttonNext);
+                    }
+                }
+            };
+            //the first card only shows the Next button and the last card only shows the Prev button
+            // if(`${e.currentTarget.firstElementChild.nextElementSibling.firstElementChild.textContent}` === names[0].textContent){
+            //     modalBtn.removeChild(buttonPrev);
+            // } else if(`${e.currentTarget.firstElementChild.nextElementSibling.firstElementChild.textContent}` === names[11].textContent){
+            //     modalBtn.removeChild(buttonNext);
+            // }
         })
     }
 
 }
 
 
-//add search functionality 
-const searchSubmit = document.getElementById('search-submit');
-const searchbar = document.getElementById('search-input');
-const names = document.getElementsByClassName('card-name');
-searchSubmit.addEventListener('click', (e)=>{
+//add search functionality, showing search results when typing or click the search button
+let getSearchResult = function() {
     for(let i = 0; i<names.length; i++){
-        
+        if(names[i].textContent.toLowerCase().includes(searchInput.value.toLowerCase()) && searchInput.value != null){
+            names[i].parentNode.parentNode.style.display = "flex";
+        } else {
+            names[i].parentNode.parentNode.style.display = "none";
+        }
     }
-})    
+}
+searchInput.addEventListener('keyup', getSearchResult);
+submit.addEventListener('click', getSearchResult);
+         
 
