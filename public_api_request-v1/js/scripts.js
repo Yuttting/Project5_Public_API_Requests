@@ -46,6 +46,11 @@ $.ajax({
 </div> 
 */
 const galleryDiv = document.getElementById('gallery');
+const noResult = document.createElement('p');
+noResult.textContent = "No result";
+noResult.style.display = "none";
+noResult.id = "no-result";
+galleryDiv.appendChild(noResult);
 const body = document.getElementsByTagName('body')[0];
 const names = document.getElementsByClassName('card-name');
 
@@ -211,12 +216,23 @@ function generateHTML(data){
 
 //add search functionality, showing search results when typing or click the search button
 let getSearchResult = function() {
+    noResult.style.display = "none";
     for(let i = 0; i<names.length; i++){
         if(names[i].textContent.toLowerCase().includes(searchInput.value.toLowerCase()) && searchInput.value != null){
             names[i].parentNode.parentNode.style.display = "flex";
         } else {
             names[i].parentNode.parentNode.style.display = "none";
         }
+    }
+    const cards = document.getElementsByClassName('card');
+    let num = 0;
+    for(let i = 0; i< cards.length; i++){
+        if(cards[i].style.display === 'flex'){
+            num += 1;
+        }
+    }
+    if(num === 0){
+        noResult.style.display = "flex";
     }
 }
 searchInput.addEventListener('keyup', getSearchResult);

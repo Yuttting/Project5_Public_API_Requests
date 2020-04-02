@@ -79,7 +79,11 @@ header h1 {
     max-width: 1200px;
     margin: auto;
 }
-  
+ #no-result {
+    display: flex;
+    font-size: 1 em;
+    color: #F76C6C;
+ } 
 .card {
     display: flex;
     flex-direction: row;
