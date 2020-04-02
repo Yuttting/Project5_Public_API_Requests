@@ -32,78 +32,55 @@ $.ajax({
     }
   });
 
-// Generate the markup for each profile
-/* 
-<div class="card">
-    <div class="card-img-container">
-        <img class="card-img" src="https://placehold.it/90x90" alt="profile picture">
-    </div>
-    <div class="card-info-container">
-        <h3 id="name" class="card-name cap">first last</h3>
-        <p class="card-text">email</p>
-        <p class="card-text cap">city, state</p>
-    </div>
-</div> 
-*/
+
 const galleryDiv = document.getElementById('gallery');
 const noResult = document.createElement('p');
+const body = document.getElementsByTagName('body')[0];
+const names = document.getElementsByClassName('card-name');
+
+//no result
 noResult.textContent = "No result";
 noResult.style.display = "none";
 noResult.id = "no-result";
 galleryDiv.appendChild(noResult);
-const body = document.getElementsByTagName('body')[0];
-const names = document.getElementsByClassName('card-name');
 
-
-function generateHTML(data){
-    for(let i=0; i<data.results.length; i++){
-        const cardDiv = document.createElement('div');
+//create random emplyoee cards
+function createCardDiv(imgSrc){
+    const cardDiv = document.createElement('div');
         cardDiv.className = "card";
         galleryDiv.appendChild(cardDiv);
         const cardImg = document.createElement('div');
         cardImg.className = "card-img-container";
-        cardImg.innerHTML = `<img class='card-img' src=${data.results[i].picture.large} alt='profile picture'>`;
+        cardImg.innerHTML = `<img class='card-img' src=${imgSrc} alt='profile picture'>`;
         cardDiv.appendChild(cardImg);
+        return cardDiv;
+}
 
-        const cardInfo = document.createElement('div');
+function createCardInfo (dataresult, cardDiv){
+    const cardInfo = document.createElement('div');
         cardInfo.className = "card-info-container";
-        let byear = `${data.results[i].dob.date}`.slice(0,4);
-        let bmonth = `${data.results[i].dob.date}`.slice(5,7);
-        let bday = `${data.results[i].dob.date}`.slice(8,10);
+        let byear = `${dataresult.dob.date}`.slice(0,4);
+        let bmonth = `${dataresult.dob.date}`.slice(5,7);
+        let bday = `${dataresult.dob.date}`.slice(8,10);
         cardInfo.innerHTML = `
-            <h3 id="name" class="card-name cap">${data.results[i].name.first} ${data.results[i].name.last}</h3>
-            <p class="card-text">${data.results[i].email}</p>
-            <p class="card-text cap">${data.results[i].location.city}</p>
-            <p class = "hide">${data.results[i].phone}</p>
-            <p class = "hide">${data.results[i].location.street.number} ${data.results[i].location.street.name}, ${data.results[i].location.state} ${data.results[i].location.postcode}</p>
+            <h3 id="name" class="card-name cap">${dataresult.name.first} ${dataresult.name.last}</h3>
+            <p class="card-text">${dataresult.email}</p>
+            <p class="card-text cap">${dataresult.location.city}</p>
+            <p class = "hide">${dataresult.phone}</p>
+            <p class = "hide">${dataresult.location.street.number} ${dataresult.location.street.name}, ${dataresult.location.state} ${dataresult.location.postcode}</p>
             <p class = "hide">Birthday: ${bmonth}/${bday}/${byear}</p>
             `;
         cardDiv.appendChild(cardInfo);
+        return cardInfo;
+}
 
-        
+function generateHTML(data){
+    for(let i=0; i<data.results.length; i++){
+        const dataresult = data.results[i];
+        const cardDiv = createCardDiv(dataresult.picture.large);
+        const cardInfo = createCardInfo(dataresult, cardDiv);
+
         // when click a card, shows a modal window
-        // <div class="modal-container">
-        //     <div class="modal">
-        //         <button type="button" id="modal-close-btn" class="modal-close-btn"><strong>X</strong></button>
-        //         <div class="modal-info-container">
-        //             <img class="modal-img" src="https://placehold.it/125x125" alt="profile picture">
-        //             <h3 id="name" class="modal-name cap">name</h3>
-        //             <p class="modal-text">email</p>
-        //             <p class="modal-text cap">city</p>
-        //             <hr>
-        //             <p class="modal-text">(555) 555-5555</p>
-        //             <p class="modal-text">123 Portland Ave., Portland, OR 97204</p>
-        //             <p class="modal-text">Birthday: 10/21/2015</p>
-        //         </div>
-        //     </div>
-
-        //     // IMPORTANT: Below is only for exceeds tasks 
-        //     <div class="modal-btn-container">
-        //         <button type="button" id="modal-prev" class="modal-prev btn">Prev</button>
-        //         <button type="button" id="modal-next" class="modal-next btn">Next</button>
-        //     </div>
-        // </div>
-
         const modalContainer = document.createElement('div');
         modalContainer.className = "modal-container";
         const modal = document.createElement('div');
@@ -178,7 +155,7 @@ function generateHTML(data){
                     }
                 }
             };
-
+      
             buttonNext.onclick = function(e){
                 for(let j = names.length -2; j > -1; j--){
                     if(names[j].textContent === e.target.parentNode.previousSibling.children[1].children[1].textContent){
@@ -225,6 +202,8 @@ let getSearchResult = function() {
         }
     }
     const cards = document.getElementsByClassName('card');
+
+    //show no result
     let num = 0;
     for(let i = 0; i< cards.length; i++){
         if(cards[i].style.display === 'flex'){
