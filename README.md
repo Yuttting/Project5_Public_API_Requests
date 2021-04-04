@@ -8,3 +8,5 @@
  card (when hover): #F8E9A1
  modal: #F8E9A1
  prev & next buttons: #F76C6C
+ 
+ Github page: https://yuttting.github.io/Project_PublicAPIRequests/
